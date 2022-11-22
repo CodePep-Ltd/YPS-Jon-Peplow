@@ -83,3 +83,20 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+app/src/androidTest/java/com/codepep/yps/ExampleInstrumentedTest.kt
+app/src/test/java/com/codepep/yps/ExampleUnitTest.kt
+app/src/main/res/drawable-v24/ic_launcher_foreground.xml
+app/src/main/res/drawable/ic_launcher_background.xml
+app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
+app/src/main/res/mipmap-hdpi/ic_launcher.webp
+app/src/main/res/mipmap-hdpi/ic_launcher_round.webp
+app/src/main/res/mipmap-mdpi/ic_launcher.webp
+app/src/main/res/mipmap-mdpi/ic_launcher_round.webp
+app/src/main/res/mipmap-xhdpi/ic_launcher.webp
+app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp
+app/src/main/res/mipmap-xxhdpi/ic_launcher.webp
+app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp
+app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp
+app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp
+app/src/main/res/values-night/themes.xml
