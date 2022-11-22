@@ -14,7 +14,7 @@ import javax.inject.Inject
 class RedditHotViewModel@Inject constructor(
 private val repository: RedditHotRepository
 ): ViewModel() {
-    val state = MutableStateFlow<ViewModelState>(ViewModelState.START)
+    val state = MutableStateFlow<ViewModelState>(ViewModelState.LOADING)
 
     init {
         loadHotTopics()
@@ -24,7 +24,12 @@ private val repository: RedditHotRepository
         state.value = ViewModelState.LOADING
         try {
             val item = withContext(Dispatchers.IO) { repository.fetchHotTopics() }
-                state.value = ViewModelState.SUCCESS(item.body()!!)
+            val data = item.body()
+            data?.let {
+                state.value = ViewModelState.SUCCESS(it)
+            }?: run {
+                state.value = ViewModelState.FAILURE("Data is null!")
+            }
         } catch (e: Exception) {
             state.value = ViewModelState.FAILURE(e.localizedMessage)
         }
