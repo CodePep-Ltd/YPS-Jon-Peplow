@@ -111,7 +111,7 @@ dependencies {
 
     // network
     implementation "com.squareup.okhttp3:logging-interceptor:$versions.okhttpVersion"
-    implementation "com.squareup.retrofit2:converter-gson:$versions.retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-moshi:$versions.retrofitMoshiVersion"
     testImplementation "com.squareup.okhttp3:mockwebserver:$versions.okhttpVersion"
 
     // coroutines
