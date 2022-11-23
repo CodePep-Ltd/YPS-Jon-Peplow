@@ -23,5 +23,7 @@ data class RedditHotChildData(
     @field:Json(name = "author")
     var author: String?,
     @field:Json(name = "url")
-    var url: String?
+    var url: String?,
+    @field:Json(name = "thumbnail")
+    var thumbnail: String?
 )

@@ -119,6 +119,9 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.coroutinesVersion"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.coroutinesVersion"
 
+    // Images
+    implementation "io.coil-kt:coil-compose:2.0.0-rc01"
+
     // unit test
     testImplementation "junit:junit:$versions.junitVersion"
     testImplementation "androidx.test:core:$versions.androidxTest"
