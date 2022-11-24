@@ -15,23 +15,40 @@ class RedditHotViewModel@Inject constructor(
 private val repository: RedditHotRepository
 ): ViewModel() {
     val state = MutableStateFlow<ViewModelState>(ViewModelState.LOADING)
+    private var hasLoaded = false
+    private lateinit var pageManagement: RedditListDataManagement
 
     init {
         loadHotTopics()
     }
 
-    private fun loadHotTopics() = viewModelScope.launch {
-        state.value = ViewModelState.LOADING
-        try {
-            val item = withContext(Dispatchers.IO) { repository.fetchHotTopics() }
-            val data = item.body()
-            data?.let {
-                state.value = ViewModelState.SUCCESS(it)
-            }?: run {
-                state.value = ViewModelState.FAILURE("Data is null!")
+    fun loadHotTopics() = viewModelScope.launch {
+        if (hasLoaded) {
+            if (pageManagement.hasReachedEnd()) {
+                state.value = ViewModelState.SUCCESS(pageManagement.getFinalItems())
+            } else {
+                state.value = ViewModelState.LOADING
+                state.value = ViewModelState.SUCCESS(pageManagement.getNextItems())
             }
-        } catch (e: Exception) {
-            state.value = ViewModelState.FAILURE(e.localizedMessage)
+        } else {
+            try {
+                val item = withContext(Dispatchers.IO) { repository.fetchHotTopics() }
+                val data = item.body()
+                data?.let {
+                    pageManagement =
+                        RedditListDataManagement(PAGE_COUNT, it)
+                    state.value = ViewModelState.SUCCESS(pageManagement.getInitItems())
+                    hasLoaded = true
+                }?: run {
+                    state.value = ViewModelState.FAILURE("Data is null!")
+                }
+            } catch (e: Exception) {
+                state.value = ViewModelState.FAILURE(e.localizedMessage)
+            }
         }
+    }
+
+    companion object {
+        const val PAGE_COUNT = 5
     }
 }
