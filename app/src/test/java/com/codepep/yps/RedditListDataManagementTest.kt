@@ -1,17 +1,21 @@
 package com.codepep.yps
 
-import com.codepep.yps.dto.RedditHotChildData
-import com.codepep.yps.dto.RedditSubBottomLevelData
-import com.codepep.yps.dto.RedditSubTopLevelData
 import com.codepep.yps.dto.RedditTopLevelData
 import com.codepep.yps.model.datamanagment.RedditListDataManagement
 import junit.framework.TestCase.assertEquals
+import org.junit.Before
 import org.junit.Test
 
 class RedditListDataManagementTest {
     private val itemsPerPageCount = 5
     private val mockDataChildCount = 20
-    private val mockData: RedditTopLevelData = getMockData()
+
+    private lateinit var mockData: RedditTopLevelData
+
+    @Before
+    fun setup() {
+        mockData = MockRedditItemsDataProvider.getMockData(mockDataChildCount)
+    }
 
     @Test
     fun `init items return paged requested amount`() {
@@ -38,22 +42,5 @@ class RedditListDataManagementTest {
         assertEquals("End of items not reached. Update test!", true, manager.hasReachedEnd())
         val items = manager.getFinalItems()
         assertEquals("Unexpected initial count of items returned", mockDataChildCount, items.size)
-    }
-
-    private fun getMockData(): RedditTopLevelData {
-        val childrenList = ArrayList<RedditSubBottomLevelData>()
-        for (i in 1..mockDataChildCount) {
-            childrenList.add(RedditSubBottomLevelData(data = RedditHotChildData(
-                title = "name$i" ,
-                author = "author$i",
-                url = "url$i",
-                thumbnail = "thumbnail$i"
-            )))
-        }
-        return RedditTopLevelData(
-            data = RedditSubTopLevelData(
-                children = childrenList
-            )
-        )
     }
 }

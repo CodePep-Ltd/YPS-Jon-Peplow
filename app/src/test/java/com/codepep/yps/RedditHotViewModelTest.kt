@@ -6,8 +6,7 @@ import com.codepep.yps.dto.RedditTopLevelData
 import com.codepep.yps.model.RedditHotViewModel
 import com.codepep.yps.model.ViewModelState
 import com.codepep.yps.model.datamanagment.RedditListDataManagement
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -15,6 +14,7 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import retrofit2.Response
 
@@ -22,6 +22,7 @@ import retrofit2.Response
 class RedditHotViewModelTest {
 
     private val itemsPerPage = 5
+    private val mockDataChildCount = 1
 
     @get:Rule
     val mainCoroutineRule = MainCoroutineRule()
@@ -30,6 +31,7 @@ class RedditHotViewModelTest {
 
     private lateinit var repository: RedditHotRepository
     private lateinit var dataManagement: RedditListDataManagement
+    private lateinit var mockData: RedditTopLevelData
 
     @Before
     fun setup() {
@@ -37,6 +39,23 @@ class RedditHotViewModelTest {
         val mockApiInter = mock<RedditHotApiInter>()
         repository = RedditHotRepository(mockApiInter)
         dataManagement = RedditListDataManagement(itemsPerPage)
+    }
+
+    @Test
+    fun `loads data when first run`() = runTest {
+        val mockData = MockRedditItemsDataProvider.getMockData(mockDataChildCount)
+        val mockResponse = mock<Response<RedditTopLevelData>>()
+        whenever(mockResponse.body()).thenReturn(mockData)
+        val mockRepository = Mockito.mock(RedditHotRepository::class.java)
+        whenever(mockRepository.fetchHotTopics()).thenReturn(mockResponse)
+        val mockDataManagement = Mockito.mock(RedditListDataManagement::class.java)
+        val dataResult = mockData.data.children.toMutableList()
+        whenever(mockDataManagement.getInitItems()).thenReturn(dataResult)
+        val viewModel = RedditHotViewModel(mockRepository, testDispatcher, mockDataManagement)
+        verify(mockRepository, times(1)).fetchHotTopics()
+        verify(mockDataManagement, times(1)).setMainItem(mockData)
+        verify(mockDataManagement, times(1)).getInitItems()
+        Assert.assertEquals("Success state not set!", ViewModelState.SUCCESS(dataResult), viewModel.state.value)
     }
 
     @Test
