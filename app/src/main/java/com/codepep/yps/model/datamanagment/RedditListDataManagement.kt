@@ -1,24 +1,28 @@
-package com.codepep.yps.model
+package com.codepep.yps.model.datamanagment
 
 import com.codepep.yps.dto.RedditSubBottomLevelData
 import com.codepep.yps.dto.RedditTopLevelData
 
 class RedditListDataManagement(
-    private val itemsPerPage: Int,
-    private val mainItem: RedditTopLevelData
-) {
+    private val itemsPerPage: Int
+) : RedditListDataManInter {
     private var page: Int = 1
     private var hasReachedEnd: Boolean = false
     private var listItems: MutableList<RedditSubBottomLevelData> = ArrayList()
+    private lateinit var mainItem: RedditTopLevelData
 
-    fun getInitItems(): MutableList<RedditSubBottomLevelData> {
+    override fun setMainItem(item: RedditTopLevelData) {
+        mainItem = item
+    }
+
+    override fun getInitItems(): MutableList<RedditSubBottomLevelData> {
         for (i in 1.rangeTo(itemsPerPage)) {
             listItems.add(mainItem.data.children[i-1])
         }
         return listItems
     }
 
-    fun getNextItems(): MutableList<RedditSubBottomLevelData> {
+    override fun getNextItems(): MutableList<RedditSubBottomLevelData> {
         if (hasReachedEnd) {
             return listItems
         }
@@ -35,7 +39,7 @@ class RedditListDataManagement(
         return listItems
     }
 
-    fun getFinalItems(): MutableList<RedditSubBottomLevelData> = listItems
+    override fun getFinalItems(): MutableList<RedditSubBottomLevelData> = listItems
 
-    fun hasReachedEnd(): Boolean = hasReachedEnd
+    override fun hasReachedEnd(): Boolean = hasReachedEnd
 }
