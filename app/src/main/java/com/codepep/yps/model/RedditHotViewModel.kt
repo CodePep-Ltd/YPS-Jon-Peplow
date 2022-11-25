@@ -25,8 +25,10 @@ private val dataManagement: RedditListDataManagement
         loadHotTopics()
     }
 
+    fun hasLoaded(): Boolean = hasLoaded
+
     fun loadHotTopics() = viewModelScope.launch {
-        if (hasLoaded) {
+        if (hasLoaded()) {
             if (dataManagement.hasReachedEnd()) {
                 state.value = ViewModelState.SUCCESS(dataManagement.getFinalItems())
             } else {

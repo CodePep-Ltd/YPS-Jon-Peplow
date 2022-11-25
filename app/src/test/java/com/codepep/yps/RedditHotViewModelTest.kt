@@ -39,11 +39,49 @@ class RedditHotViewModelTest {
         val mockApiInter = mock<RedditHotApiInter>()
         repository = RedditHotRepository(mockApiInter)
         dataManagement = RedditListDataManagement(itemsPerPage)
+        mockData = MockRedditItemsDataProvider.getMockData(mockDataChildCount)
+    }
+
+    @Test
+    fun `uses next data from list when previously loaded from api and not reached end of list`() = runTest {
+        val mockResponse = mock<Response<RedditTopLevelData>>()
+        whenever(mockResponse.body()).thenReturn(mockData)
+        val mockRepository = Mockito.mock(RedditHotRepository::class.java)
+        whenever(mockRepository.fetchHotTopics()).thenReturn(mockResponse)
+        val mockDataManagement = Mockito.mock(RedditListDataManagement::class.java)
+        val dataResult = mockData.data.children.toMutableList()
+        whenever(mockDataManagement.hasReachedEnd()).thenReturn(false)
+        whenever(mockDataManagement.getNextItems()).thenReturn(dataResult)
+
+        val viewModel = RedditHotViewModel(mockRepository, testDispatcher, mockDataManagement)
+        // Load the next page of results:
+        viewModel.loadHotTopics()
+
+        verify(mockDataManagement, times(1)).getNextItems()
+        Assert.assertEquals("Success state not set!", ViewModelState.SUCCESS(dataResult), viewModel.state.value)
+    }
+
+    @Test
+    fun `uses next data from list when previously loaded from api and reached end of list`() = runTest {
+        val mockResponse = mock<Response<RedditTopLevelData>>()
+        whenever(mockResponse.body()).thenReturn(mockData)
+        val mockRepository = Mockito.mock(RedditHotRepository::class.java)
+        whenever(mockRepository.fetchHotTopics()).thenReturn(mockResponse)
+        val mockDataManagement = Mockito.mock(RedditListDataManagement::class.java)
+        val dataResult = mockData.data.children.toMutableList()
+        whenever(mockDataManagement.hasReachedEnd()).thenReturn(true)
+        whenever(mockDataManagement.getFinalItems()).thenReturn(dataResult)
+
+        val viewModel = RedditHotViewModel(mockRepository, testDispatcher, mockDataManagement)
+        // Load the next page of results:
+        viewModel.loadHotTopics()
+
+        verify(mockDataManagement, times(1)).getFinalItems()
+        Assert.assertEquals("Success state not set!", ViewModelState.SUCCESS(dataResult), viewModel.state.value)
     }
 
     @Test
     fun `loads data when first run`() = runTest {
-        val mockData = MockRedditItemsDataProvider.getMockData(mockDataChildCount)
         val mockResponse = mock<Response<RedditTopLevelData>>()
         whenever(mockResponse.body()).thenReturn(mockData)
         val mockRepository = Mockito.mock(RedditHotRepository::class.java)
@@ -51,7 +89,9 @@ class RedditHotViewModelTest {
         val mockDataManagement = Mockito.mock(RedditListDataManagement::class.java)
         val dataResult = mockData.data.children.toMutableList()
         whenever(mockDataManagement.getInitItems()).thenReturn(dataResult)
+
         val viewModel = RedditHotViewModel(mockRepository, testDispatcher, mockDataManagement)
+
         verify(mockRepository, times(1)).fetchHotTopics()
         verify(mockDataManagement, times(1)).setMainItem(mockData)
         verify(mockDataManagement, times(1)).getInitItems()
