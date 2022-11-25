@@ -54,7 +54,9 @@ class MainActivity : ComponentActivity() {
                 Text(text = "An error occurred")
             }
             is ViewModelState.LOADING -> {
-                Text(text = "LOADING...")
+                CircularProgressIndicator(modifier = Modifier.size(25.dp),
+                    color = Color.Blue,
+                    strokeWidth = 10.dp)
             }
             is ViewModelState.SUCCESS -> {
                 val items = (state as ViewModelState.SUCCESS).items
