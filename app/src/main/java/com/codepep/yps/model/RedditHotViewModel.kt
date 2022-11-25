@@ -30,7 +30,6 @@ private val dataManagement: RedditListDataManagement
             if (dataManagement.hasReachedEnd()) {
                 state.value = ViewModelState.SUCCESS(dataManagement.getFinalItems())
             } else {
-                state.value = ViewModelState.LOADING
                 state.value = ViewModelState.SUCCESS(dataManagement.getNextItems())
             }
         } else {
