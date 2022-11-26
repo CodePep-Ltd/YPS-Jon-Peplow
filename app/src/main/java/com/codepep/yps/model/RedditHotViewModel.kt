@@ -27,6 +27,11 @@ private val dataManagement: RedditListDataManagement
 
     fun hasLoaded(): Boolean = hasLoaded
 
+    fun refresh() {
+        hasLoaded = false
+        loadHotTopics()
+    }
+
     fun loadHotTopics() = viewModelScope.launch {
         if (hasLoaded()) {
             if (dataManagement.hasReachedEnd()) {
@@ -36,6 +41,7 @@ private val dataManagement: RedditListDataManagement
             }
         } else {
             try {
+                state.value = ViewModelState.LOADING
                 val item = withContext(ioDispatcher) {
                     repository.fetchHotTopics()
                 }

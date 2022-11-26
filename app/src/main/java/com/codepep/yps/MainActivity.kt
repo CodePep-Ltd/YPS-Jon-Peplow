@@ -12,7 +12,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.PullRefreshState
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -46,8 +51,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
-    fun ListCreator(viewModel : RedditHotViewModel) {
+    fun ListCreator(viewModel : RedditHotViewModel, pullRefreshState: PullRefreshState) {
         val state by viewModel.state.collectAsState()
         when (state) {
             is ViewModelState.FAILURE -> {
@@ -60,22 +66,31 @@ class MainActivity : ComponentActivity() {
             }
             is ViewModelState.SUCCESS -> {
                 val items = (state as ViewModelState.SUCCESS).items
-                HotTopicsListEnhanced(viewModel, items)
+                HotTopicsListEnhanced(viewModel, items, pullRefreshState)
             }
         }
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun MainView() {
         val viewModel : RedditHotViewModel = viewModel()
-        ListCreator(viewModel)
+        val state by viewModel.state.collectAsState()
+        val refreshing = state == ViewModelState.LOADING
+        val pullRefreshState
+        = rememberPullRefreshState(refreshing && viewModel.hasLoaded(),
+            { viewModel.refresh() })
+        ListCreator(viewModel, pullRefreshState)
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
-    fun HotTopicsListEnhanced(viewModel : RedditHotViewModel, items: MutableList<RedditSubBottomLevelData>) {
+    fun HotTopicsListEnhanced(viewModel : RedditHotViewModel,
+                              items: MutableList<RedditSubBottomLevelData>,
+                                pullRefreshState: PullRefreshState) {
         val context = LocalContext.current
         val listState = rememberLazyListState()
-        LazyColumn(state = listState) {
+        LazyColumn(Modifier.pullRefresh(pullRefreshState), state = listState) {
             itemsIndexed(items) { _, item ->
                 RedditCardItem(item, context)
             }

@@ -10,6 +10,7 @@ ext.versions = [
 
         // material
         materialVersion      : '1.7.0',
+        composeMatVersion    : '1.3.0',
 
         // compose
         composeCompiler      : '1.3.2',
