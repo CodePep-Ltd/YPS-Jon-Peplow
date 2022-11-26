@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -21,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -40,7 +40,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
@@ -53,11 +52,32 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
-    fun ListCreator(viewModel : RedditHotViewModel, pullRefreshState: PullRefreshState) {
+    fun MainUI(viewModel : RedditHotViewModel, pullRefreshState: PullRefreshState) {
         val state by viewModel.state.collectAsState()
         when (state) {
             is ViewModelState.FAILURE -> {
-                Text(text = "An error occurred")
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    Text(
+                        modifier = Modifier.padding(10.dp),
+                        fontSize = 30.sp,
+                        text = stringResource(id = R.string.error_text),
+                        textAlign = TextAlign.Center,
+                    )
+                    Button(onClick = {
+                        viewModel.refresh()
+                    }, Modifier.size(200.dp, 75.dp),
+                        colors =
+                        ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray),)
+                    {
+                        Text(text = stringResource(id = R.string.refresh_btn_text),color = Color.White, fontSize = 30.sp)
+                    }
+                }
             }
             is ViewModelState.LOADING -> {
                 CircularProgressIndicator(modifier = Modifier.size(25.dp),
@@ -80,7 +100,7 @@ class MainActivity : ComponentActivity() {
         val pullRefreshState
         = rememberPullRefreshState(refreshing && viewModel.hasLoaded(),
             { viewModel.refresh() })
-        ListCreator(viewModel, pullRefreshState)
+        MainUI(viewModel, pullRefreshState)
     }
 
     @OptIn(ExperimentalMaterialApi::class)
