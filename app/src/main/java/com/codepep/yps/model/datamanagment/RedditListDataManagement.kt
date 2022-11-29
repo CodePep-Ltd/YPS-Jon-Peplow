@@ -12,6 +12,7 @@ class RedditListDataManagement(
     private lateinit var mainItem: RedditTopLevelData
 
     override fun setMainItem(item: RedditTopLevelData) {
+        page = 1
         mainItem = item
     }
 
